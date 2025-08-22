@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ElementVerse</title>
+  <!-- Removed <base> tag to avoid path resolution issues; use relative paths -->
+  <style>
+    @font-face {
+      font-family: 'Hacked';
+      src: url('./assets/fonts/Hacked.ttf') format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Inter-VariableFont_opsz,wght';
+      src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Orbitron';
+      src: url('./assets/fonts/Orbitron.ttf') format('truetype');
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* BODY */
+    body {
+      font-family: Arial, Helvetica, sans-serif; /* Added fallback fonts */
+      color: #ffffff;
+      transition: background-color 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e1e2f);
+      background-size: 400% 400%;
+      animation: gradientBG 18s ease infinite;
+    }
+
+    body.ready {
+      opacity: 1;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* SEARCH CONTAINER (homepage) */
+    #search-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      background-image: linear-gradient(rgba(20,20,30,0.75), rgba(20,20,30,0.75)), url('./assets/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    #search-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(0,160,200,0.08), rgba(255,40,120,0.06), rgba(10,10,60,0.05));
+      background-size: 300% 300%;
+      z-index: 0;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      animation: subtleOverlay 16s ease infinite;
+    }
+
+    @keyframes subtleOverlay {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    #search-container > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Typing headings */
+    .typing-heading {
+      font-family: 'Hacked', Arial, sans-serif; /* Added fallback */
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      letter-spacing: 2px;
+      transform: skewX(-10deg);
+      margin-bottom: 2rem;
+      display: inline-block;
+      position: relative;
+      opacity: 0;
+      animation: popUpText 0.8s ease-out forwards;
+      animation-delay: 0.2s;
+      text-shadow: 0 2px 8px rgba(0,240,255,0.3);
+    }
+
+    .typing-heading::after {
+      content: '|';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Hacked', Arial, sans-serif;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      color: #00f0ff;
+      animation: blink 0.7s step-end infinite;
+    }
+
+    .typing-subheading {
+      font-family: 'Inter-VariableFont_opsz,wght', Arial, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+      display: inline-block;
+      position: relative;
+      opacity: 0;
+      animation: popUpText 0.8s ease-out forwards;
+      animation-delay: 0.4s;
+      color: #e0e0e0;
+    }
+
+    .typing-subheading::after {
+      content: '|';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Inter-VariableFont_opsz,wght', Arial, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      color: #00f0ff;
+      animation: blink 0.7s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes popUpText {
+      0% { opacity: 0; transform: translateY(50px) skewX(-10deg); }
+      100% { opacity: 1; transform: translateY(0) skewX(-10deg); }
+    }
+
+    @keyframes popUpSearch {
+      0% { opacity: 0; transform: translateY(50px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* GLASS SEARCH BOX */
+    .search-box {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      opacity: 0;
+      animation: popUpSearch 0.8s ease-out forwards;
+      animation-delay: 0.6s;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px) saturate(130%);
+      -webkit-backdrop-filter: blur(12px) saturate(130%);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .search-box:focus-within {
+      transform: translateY(-4px) scale(1.02);
+      border-color: rgba(0,220,255,0.7);
+      box-shadow: 0 10px 40px rgba(0,150,200,0.2);
+    }
+
+    #atomic-number-input {
+      width: 100%;
+      padding: 14px 50px 14px 25px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.1rem;
+      background: transparent;
+      color: #fff;
+      box-sizing: border-box;
+      outline: none;
+      caret-color: #00f0ff;
+      transition: box-shadow 0.2s ease;
+    }
+
+    #atomic-number-input:focus {
+      box-shadow: 0 4px 20px rgba(0,240,255,0.15) inset;
+    }
+
+    #search-button {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    #search-button:hover {
+      transform: translateY(-50%) scale(1.15);
+      filter: brightness(1.2);
+    }
+
+    #search-button:focus {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
+    }
+
+    #error-message {
+      color: #ff6666;
+      margin-top: 12px;
+      height: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    /* LOADING OVERLAY */
+    #loading-container {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      transition: opacity 0.3s ease;
+    }
+
+    #loading-gif {
+      width: 180px;
+      height: 180px;
+      filter: drop-shadow(0 0 10px rgba(0,240,255,0.3));
+    }
+
+    /* RESULTS */
+    #results-container {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #010224;
+      padding: 30px 40px;
+      box-sizing: border-box;
+      font-family: 'Orbitron', Arial, sans-serif;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .results-header {
+      font-size: clamp(1.8rem, 5vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 35px;
+      color: #38bdf8;
+      text-shadow: 0 2px 8px rgba(56,189,248,0.3);
+    }
+
+    /* Particle canvases */
+    .particles-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      touch-action: none;
+    }
+
+    /* Results content */
+    .results-content {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 30px;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    .element-info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 250px;
+      z-index: 1;
+    }
+
+    #element-tile-image,
+    .element-image {
+      width: 200px;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #element-tile-image:hover,
+    .element-image:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(0,240,255,0.2);
+    }
+
+    #element-tile-image.error,
+    .element-image.error {
+      background: #333;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 10px;
+    }
+
+    .element-name-bottom {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      color: #ff0368;
+      text-shadow: 0 2px 8px rgba(255,3,104,0.3);
+    }
+
+    .element-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-width: 300px;
+      flex: 1;
+      z-index: 1;
+    }
+
+    .element-details ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: #ffe603;
+    }
+
+    .element-details ul li {
+      margin-bottom: 0.7em;
+    }
+
+    .element-details p {
+      color: #e0e0e0;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+
+    .element-details ul li strong {
+      font-weight: 700;
+      color: #fff;
+      margin-right: 5px;
+    }
+
+    /* PERIODIC TABLE */
+    #periodic-table-container {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      background: #010224;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      font-family: 'Orbitron', Arial, sans-serif;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .table-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      z-index: 1;
+    }
+
+    #periodic-grid {
+      display: grid;
+      grid-template-columns: repeat(19, minmax(40px, 5vw));
+      gap: 5px;
+      justify-content: center;
+      z-index: 1;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .periodic-cell {
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(85,85,85,0.3);
+      position: relative;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.05);
+      color: #38bdf8;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .periodic-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .periodic-cell img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 12px rgba(0,188,212,0.5), 0 0 25px rgba(56,189,248,0.3);
+    }
+
+    .periodic-cell img:focus {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
+    }
+
+    .periodic-cell img.error {
+      background: #333;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 10px;
+    }
+
+    .period-number-centered {
+      font-size: 1rem;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      #search-container {
+        padding: 15px;
+      }
+
+      .typing-heading {
+        font-size: clamp(1.8rem, 7vw, 2.8rem);
+      }
+
+      .typing-subheading {
+        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+      }
+
+      .search-box {
+        max-width: 400px;
+        padding: 6px;
+      }
+
+      #atomic-number-input {
+        padding: 12px 45px 12px 20px;
+        font-size: 1rem;
+      }
+
+      #results-container {
+        padding: 20px;
+      }
+
+      .results-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .element-info-left {
+        min-width: auto;
+        align-items: center;
+      }
+
+      .element-details {
+        min-width: auto;
+        margin-top: 15px;
+      }
+
+      .results-header {
+        font-size: clamp(1.5rem, 4vw, 1.8rem);
+      }
+
+      #periodic-grid {
+        grid-template-columns: repeat(19, minmax(30px, 4.5vw));
+        gap: 4px;
+      }
+
+      .periodic-cell {
+        width: 45px;
+        height: 45px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .typing-heading {
+        font-size: clamp(1.5rem, 6vw, 2.2rem);
+      }
+
+      .typing-subheading {
+        font-size: clamp(0.8rem, 1.6vw, 1rem);
+      }
+
+      .search-box {
+        max-width: 90%;
+      }
+
+      #atomic-number-input {
+        font-size: 0.9rem;
+      }
+
+      #results-container {
+        padding: 15px;
+      }
+
+      #periodic-grid {
+        grid-template-columns: repeat(19, minmax(25px, 4vw));
+      }
+
+      .periodic-cell {
+        width: 35px;
+        height: 35px;
+      }
+    }
+
+    /* Accessibility improvements */
+    #atomic-number-input:focus,
+    #search-button:focus {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <div id="search-container">
+    <div class="typing-heading" id="typing-heading"></div>
+    <div class="search-box">
+      <input type="text" id="atomic-number-input" placeholder="Search by atomic number, name, symbol, or group (e.g., Group-1)" aria-label="Search for an element by atomic number, name, symbol, or group" autofocus>
+      <button id="search-button" aria-label="Search for element" aria-controls="results-container periodic-table-container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#00bcd4"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      </button>
+    </div>
+    <p id="error-message" aria-live="polite"></p>
+    <div class="typing-subheading" id="typing-subheading"></div>
+  </div>
+
+  <div id="loading-container">
+    <img id="loading-gif" src="./assets/images/loading.gif" alt="Loading...">
+  </div>
+
+  <div id="results-container">
+    <canvas id="results-particles" class="particles-canvas" aria-hidden="true"></canvas>
+    <h2 class="results-header" id="results-title"></h2>
+    <div class="results-content">
+      <div class="element-info-left">
+        <img src="" alt="Element Tile" id="element-tile-image">
+        <h3 class="element-name-bottom" id="element-name-main"></h3>
+        <img src="" alt="Element Photo" class="element-image" id="element-photo-image">
+      </div>
+      <div class="element-details">
+        <ul id="details-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="periodic-table-container">
+    <canvas id="periodic-particles" class="particles-canvas" aria-hidden="true"></canvas>
+    <h2 class="results-header">Periodic Table</h2>
+    <div class="table-wrapper">
+      <div id="periodic-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    /* Data loading */
+    async function loadElements() {
+      try {
+        // Use CORS proxy or local JSON files if CORS issues persist
+        const res1 = await fetch("https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json");
+        if (!res1.ok) throw new Error(`HTTP error! Status: ${res1.status}`);
+        const data1 = await res1.json();
+        if (!data1.elements) throw new Error('Invalid JSON structure: elements missing');
+        const res2 = await fetch("https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/Neon20-10/PeriodicTableJSON1/refs/heads/main/PeriodicTableJSON.json");
+        if (!res2.ok) throw new Error(`HTTP error! Status: ${res2.status}`);
+        const data2 = await res2.json();
+        if (!data2.elements) throw new Error('Invalid JSON structure: elements missing');
+        const elementMap = new Map();
+        data1.elements.forEach(el => elementMap.set(el.number, el));
+        data2.elements.forEach(el => {
+          if (elementMap.has(el.number)) elementMap.set(el.number, { ...elementMap.get(el.number), ...el });
+          else elementMap.set(el.number, el);
+        });
+        elements = Array.from(elementMap.values());
+        console.log("Loaded elements:", elements.length);
+      } catch (e) {
+        console.error('Failed to load elements JSON', e);
+        errorMessage.textContent = 'Failed to load element data. Please try again later.';
+      }
+    }
+
+    loadElements();
+
+    /* DOM refs & helpers */
+    const searchContainer = document.getElementById('search-container');
+    const resultsContainer = document.getElementById('results-container');
+    const periodicContainer = document.getElementById('periodic-table-container');
+    const loadingContainer = document.getElementById('loading-container');
+    const searchInput = document.getElementById('atomic-number-input');
+    const searchButton = document.getElementById('search-button');
+    const errorMessage = document.getElementById('error-message');
+    const originalElementInfoLeftHTML = document.querySelector('.element-info-left').innerHTML;
+
+    /* Loading helpers */
+    let loadingAutoHideTimer = null;
+    function showLoading() {
+      if (loadingAutoHideTimer) { clearTimeout(loadingAutoHideTimer); loadingAutoHideTimer = null; }
+      loadingContainer.style.display = 'flex';
+      loadingAutoHideTimer = setTimeout(() => { loadingContainer.style.display = 'none'; loadingAutoHideTimer = null; }, 8000);
+      searchButton.disabled = true; searchInput.disabled = true;
+    }
+    function hideLoading() {
+      if (loadingAutoHideTimer) { clearTimeout(loadingAutoHideTimer); loadingAutoHideTimer = null; }
+      loadingContainer.style.display = 'none';
+      searchButton.disabled = false; searchInput.disabled = false;
+    }
+
+    /* Smooth fade helpers */
+    function fadeOut(elem, cb) {
+      if (!elem) { if (cb) cb(); return; }
+      const cs = window.getComputedStyle(elem);
+      if (cs.display === 'none' || cs.opacity === '0') { elem.style.display = 'none'; if (cb) cb(); return; }
+      elem.style.transition = 'opacity 280ms ease, transform 280ms ease';
+      elem.style.opacity = '1';
+      elem.style.transform = 'translateY(0)';
+      requestAnimationFrame(() => { elem.style.opacity = '0'; elem.style.transform = 'translateY(8px)'; });
+      let done = false;
+      const h = () => {
+        if (done) return;
+        done = true;
+        elem.style.display = 'none';
+        elem.removeEventListener('transitionend', h);
+        if (cb) cb();
+      };
+      elem.addEventListener('transitionend', h);
+      setTimeout(h, 360);
+    }
+    function fadeIn(elem, display = 'flex', cb) {
+      if (!elem) { if (cb) cb(); return; }
+      elem.style.display = display;
+      elem.style.opacity = '0';
+      elem.style.transform = 'translateY(8px)';
+      requestAnimationFrame(() => {
+        elem.style.transition = 'opacity 320ms ease, transform 320ms ease';
+        elem.style.opacity = '1';
+        elem.style.transform = 'translateY(0)';
+      });
+      let done = false;
+      const h = () => {
+        if (done) return;
+        done = true;
+        elem.removeEventListener('transitionend', h);
+        if (cb) cb();
+      };
+      elem.addEventListener('transitionend', h);
+      setTimeout(h, 420);
+    }
+
+    /* Show element details / periodic grid */
+    function showElementData(atomicNumber) {
+      const element = elements.find(e => e.number === atomicNumber);
+      if (!element) { errorMessage.textContent = 'Invalid input. Please enter 1-118, name or symbol.'; hideLoading(); return; }
+      errorMessage.textContent = '';
+      const ordinalSuffix = n => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+      document.getElementById('results-title').textContent = `The ${ordinalSuffix(element.number)} element is ${element.name} (${element.symbol})`;
+      document.querySelector('.element-info-left').innerHTML = originalElementInfoLeftHTML;
+      const tileImg = document.getElementById('element-tile-image');
+      const mainName = document.getElementById('element-name-main');
+      const photoImg = document.getElementById('element-photo-image');
+      if (tileImg) {
+        tileImg.src = `./assets/images/elements/${element.number}-tile.png`;
+        tileImg.alt = `Tile for ${element.name}`;
+        tileImg.onerror = function() { this.classList.add('error'); this.src = ''; this.textContent = 'Image not found'; };
+      }
+      if (mainName) mainName.textContent = element.name;
+      if (photoImg) {
+        photoImg.src = `./assets/images/elements/${element.number}-photo.png`;
+        photoImg.alt = `Photo of ${element.name}`;
+        photoImg.onerror = function() { this.classList.add('error'); this.src = ''; this.textContent = 'Image not found'; };
+      }
+      const detailsList = document.getElementById('details-list');
+      detailsList.innerHTML = `
+        <li><strong>Symbol:</strong> ${element.symbol}</li>
+        <li><strong>Atomic Number:</strong> ${element.number}</li>
+        <li><strong>Atomic Mass:</strong> ${element.atomic_mass} u</li>
+        <li><strong>Group / Category:</strong> ${element.category || element.group || element.group_block || "Unknown"}</li>
+        <li><strong>Discovery:</strong> ${element.discovered_by || "Unknown"}</li>
+        <li><strong>Electron Configuration:</strong><br>${element.electron_configuration}</li>
+        <li><strong>Melting Point:</strong> ${element.melt || "Unknown"} K</li>
+        <li><strong>Boiling Point:</strong> ${element.boil || "Unknown"} K</li>
+        <li><strong>State / Appearance:</strong> ${element.appearance || "Unknown"}</li>
+        <li><strong>Density:</strong> ${element.density || "Unknown"} g/cm³</li>
+        <li><strong>Electronegativity:</strong> ${element.electronegativity_pauling || "Unknown"}</li>
+        <li><strong>Ionization Energy:</strong> ${element.ionization_energies ? element.ionization_energies[0] + " kJ/mol" : "Unknown"}</li>
+        <li><strong>Fun Fact:</strong> ${element.fun_fact || "Unknown"}</li>
+        <li><strong>Most Unknown:</strong> ${element.rare_info || "Unknown"}</li>
+        <li><strong>Interesting Info:</strong> ${element.interesting_info || "Unknown"}</li>
+        <li><strong>Speciality:</strong> ${element.speciality || "Unknown"}</li>
+      `;
+      document.querySelectorAll('.element-details .group-summary').forEach(n => n.remove());
+      if (element.summary) {
+        const summaryEl = document.createElement('p');
+        summaryEl.textContent = element.summary;
+        document.querySelector('.element-details').appendChild(summaryEl);
+      }
+      fadeOut(searchContainer, () => {
+        fadeOut(periodicContainer, () => {
+          hideLoading();
+          fadeIn(resultsContainer, 'flex', () => {
+            startParticlesForCanvas('results-particles');
+          });
+        });
+      });
+    }
+
+    function openElementFromGroup(num) {
+      document.querySelector('.element-info-left').innerHTML = originalElementInfoLeftHTML;
+      document.getElementById('details-list').innerHTML = '';
+      showElementData(num);
+    }
+
+    function findElement(rawInput) {
+      if (!elements || elements.length === 0) return null;
+      const q = String(rawInput).trim();
+      if (q === '') return null;
+      if (/^\d+$/.test(q)) { const n = parseInt(q, 10); return elements.find(e => e.number === n) || null; }
+      const qLower = q.toLowerCase();
+      const bySymbol = elements.find(e => (e.symbol || '').toLowerCase() === qLower); if (bySymbol) return bySymbol;
+      const byNameExact = elements.find(e => (e.name || '').toLowerCase() === qLower); if (byNameExact) return byNameExact;
+      const byNameStart = elements.find(e => (e.name || '').toLowerCase().startsWith(qLower)); if (byNameStart) return byNameStart;
+      const byNameIncludes = elements.find(e => (e.name || '').toLowerCase().includes(qLower)); if (byNameIncludes) return byNameIncludes;
+      const tokens = qLower.split(/\s+/).filter(Boolean);
+      for (const t of tokens) {
+        if (/^\d+$/.test(t)) { const n = parseInt(t, 10); const el = elements.find(e => e.number === n); if (el) return el; }
+        const elBySym = elements.find(e => (e.symbol || '').toLowerCase() === t); if (elBySym) return elBySym;
+        const elByName = elements.find(e => (e.name || '').toLowerCase() === t); if (elByName) return elByName;
+      }
+      return null;
+    }
+
+    function showGroupElements(groupNumber) {
+      if (!elements || elements.length === 0) { errorMessage.textContent = 'Element data not loaded yet. Try again in a moment.'; hideLoading(); return; }
+      const groupElems = elements.filter(e => e.group === groupNumber).sort((a, b) => a.number - b.number);
+      if (groupElems.length === 0) { errorMessage.textContent = `No elements found for Group ${groupNumber}.`; hideLoading(); return; }
+      const leftCol = document.querySelector('.element-info-left');
+      leftCol.innerHTML = `
+        <div style="max-height:420px; overflow:auto; padding-right:8px;">
+          <ul id="group-elements-list" style="list-style:none; margin:0; padding:0; color:#ffe603;">
+            ${groupElems.map(el => `<li style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer;" onclick="openElementFromGroup(${el.number})">
+              <strong style="color:#ffffff;">${el.symbol}</strong> &nbsp; ${el.name} &nbsp; <span style="opacity:0.8">(#${el.number})</span>
+            </li>`).join('')}
+          </ul>
+        </div>
+      `;
+      const details = document.querySelector('.element-details');
+      document.getElementById('details-list').innerHTML = '';
+      const count = groupElems.length;
+      const periods = Array.from(new Set(groupElems.map(e => e.period))).sort((a, b) => a - b);
+      const categories = Array.from(new Set(groupElems.map(e => (e.category || 'Unknown').toString()))).filter(Boolean);
+      const avgAtomicMass = groupElems.reduce((s, e) => s + (typeof e.atomic_mass === 'number' ? e.atomic_mass : 0), 0) / count;
+      const atomicMassDisplay = Number.isFinite(avgAtomicMass) ? avgAtomicMass.toFixed(2) + ' u (avg)' : 'Unknown';
+      const summaryPara = document.createElement('p');
+      summaryPara.className = 'group-summary';
+      summaryPara.innerHTML = `<strong>Group ${groupNumber} summary:</strong> ${count} element(s). Periods: ${periods.join(', ')}. Categories present: ${categories.join(', ')}. ${atomicMassDisplay}. Click any item on the left to view full details.`;
+      document.querySelectorAll('.element-details .group-summary').forEach(n => n.remove());
+      details.appendChild(summaryPara);
+      document.getElementById('results-title').textContent = `Group ${groupNumber} — Elements (${count})`;
+      fadeOut(searchContainer, () => {
+        hideLoading();
+        fadeIn(resultsContainer, 'flex', () => { startParticlesForCanvas('results-particles'); });
+      });
+    }
+
+    function showPeriodicTable() {
+      const grid = document.getElementById('periodic-grid'); grid.innerHTML = "";
+      const basePositions = {
+        1: [1, 1], 2: [18, 1],
+        3: [1, 2], 4: [2, 2], 5: [13, 2], 6: [14, 2], 7: [15, 2], 8: [16, 2], 9: [17, 2], 10: [18, 2],
+        11: [1, 3], 12: [2, 3], 13: [13, 3], 14: [14, 3], 15: [15, 3], 16: [16, 3], 17: [17, 3], 18: [18, 3],
+        19: [1, 4], 20: [2, 4], 21: [3, 4], 22: [4, 4], 23: [5, 4], 24: [6, 4], 25: [7, 4], 26: [8, 4], 27: [9, 4], 28: [10, 4], 29: [11, 4], 30: [12, 4], 31: [13, 4], 32: [14, 4], 33: [15, 4], 34: [16, 4], 35: [17, 4], 36: [18, 4],
+        37: [1, 5], 38: [2, 5], 39: [3, 5], 40: [4, 5], 41: [5, 5], 42: [6, 5], 43: [7, 5], 44: [8, 5], 45: [9, 5], 46: [10, 5], 47: [11, 5], 48: [12, 5], 49: [13, 5], 50: [14, 5], 51: [15, 5], 52: [16, 5], 53: [17, 5], 54: [18, 5],
+        55: [1, 6], 56: [2, 6], 57: [3, 9],
+        72: [4, 6], 73: [5, 6], 74: [6, 6], 75: [7, 6], 76: [8, 6], 77: [9, 6], 78: [10, 6], 79: [11, 6], 80: [12, 6], 81: [13, 6], 82: [14, 6], 83: [15, 6], 84: [16, 6], 85: [17, 6], 86: [18, 6],
+        87: [1, 7], 88: [2, 7], 89: [3, 10],
+        104: [4, 7], 105: [5, 7], 106: [6, 7], 107: [7, 7], 108: [8, 7], 109: [9, 7], 110: [10, 7], 111: [11, 7], 112: [12, 7], 113: [13, 7], 114: [14, 7], 115: [15, 7], 116: [16, 7], 117: [17, 7], 118: [18, 7],
+      };
+      const positions = {};
+      for (const [num, pos] of Object.entries(basePositions)) positions[num] = [pos[0] + 1, pos[1] + 1];
+      for (let i = 58; i <= 71; i++) positions[i] = [(i - 54) + 1, 10];
+      for (let i = 90; i <= 103; i++) positions[i] = [(i - 86) + 1, 11];
+      for (let row = 1; row <= 11; row++) {
+        for (let col = 1; col <= 19; col++) {
+          const cell = document.createElement('div'); cell.className = 'periodic-cell';
+          if (row === 1) { cell.textContent = (col === 1 ? '' : String(col - 1)); grid.appendChild(cell); continue; }
+          if (col === 1) { if (row >= 2 && row <= 8) { cell.classList.add('period-number-centered'); cell.textContent = String(row - 1); } grid.appendChild(cell); continue; }
+          const found = Object.entries(positions).find(([num, pos]) => pos[0] === col && pos[1] === row);
+          if (found) {
+            const num = found[0];
+            const img = document.createElement('img');
+            img.src = `./assets/images/elements/${num}-tile.png`;
+            img.alt = `Element ${num}`;
+            img.loading = 'lazy';
+            img.onerror = function() { this.classList.add('error'); this.src = ''; this.textContent = `Element ${num}`; };
+            img.setAttribute('tabindex', '0');
+            img.addEventListener('click', () => {
+              fadeOut(periodicContainer, () => {
+                stopParticlesForCanvas('periodic-particles');
+                showElementData(parseInt(num, 10));
+              });
+            });
+            img.addEventListener('keydown', e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                fadeOut(periodicContainer, () => {
+                  stopParticlesForCanvas('periodic-particles');
+                  showElementData(parseInt(num, 10));
+                });
+              }
+            });
+            cell.appendChild(img);
+          }
+          grid.appendChild(cell);
+        }
+      }
+      fadeOut(searchContainer, () => {
+        fadeOut(resultsContainer, () => {
+          hideLoading();
+          fadeIn(periodicContainer, 'flex', () => {
+            startParticlesForCanvas('periodic-particles');
+          });
+        });
+      });
+    }
+
+    /* Search handler */
+    function handleSearch() {
+      const raw = searchInput.value.trim();
+      if (raw === '') { errorMessage.textContent = 'Please enter an atomic number (0-118), name, symbol, or group like "Group-1".'; return; }
+      const groupMatch = raw.match(/^(?:group|g)[-\s#:]*(\d{1,3})$/i);
+      if (groupMatch) {
+        const groupNum = parseInt(groupMatch[1], 10);
+        if (groupNum >= 1 && groupNum <= 18) { showLoading(); setTimeout(() => showGroupElements(groupNum), 300); return; }
+        errorMessage.textContent = 'Group number out of range. Valid group numbers are 1–18.'; return;
+      }
+      if (/^\d+$/.test(raw)) {
+        const atomicNum = parseInt(raw, 10);
+        if (atomicNum === 0) { showLoading(); setTimeout(() => showPeriodicTable(), 500); return; }
+        if (atomicNum >= 1 && atomicNum <= 118) { showLoading(); setTimeout(() => showElementData(atomicNum), 500); return; }
+        errorMessage.textContent = 'Invalid input. Enter 0-118'; hideLoading(); return;
+      }
+      if (!elements || elements.length === 0) { errorMessage.textContent = 'Element data not loaded yet. Try again in a moment.'; return; }
+      const found = findElement(raw);
+      if (found) { showLoading(); setTimeout(() => showElementData(found.number), 500); } else { errorMessage.textContent = 'No element found by that name or symbol. Try full name, symbol, atomic number, or "Group-#".'; hideLoading(); }
+    }
+
+    searchButton.addEventListener('click', handleSearch);
+    searchInput.addEventListener('keyup', e => { if (e.key === 'Enter') handleSearch(); });
+
+    /* Esc key handler for back navigation */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (resultsContainer.style.display !== 'none') {
+          fadeOut(resultsContainer, () => {
+            hideLoading();
+            fadeIn(searchContainer, 'flex', () => {
+              searchInput.value = '';
+              errorMessage.textContent = '';
+              document.querySelector('.element-info-left').innerHTML = originalElementInfoLeftHTML;
+              document.querySelectorAll('.element-details .group-summary').forEach(n => n.remove());
+              document.querySelector('.element-details p')?.remove();
+              stopParticlesForCanvas('results-particles');
+            });
+          });
+        } else if (periodicContainer.style.display !== 'none') {
+          fadeOut(periodicContainer, () => {
+            hideLoading();
+            fadeIn(searchContainer, 'flex', () => {
+              searchInput.value = '';
+              errorMessage.textContent = '';
+              document.querySelector('.element-info-left').innerHTML = originalElementInfoLeftHTML;
+              document.querySelectorAll('.element-details .group-summary').forEach(n => n.remove());
+              stopParticlesForCanvas('periodic-particles');
+            });
+          });
+        }
+      }
+    });
+
+    /* Typing */
+    const headingText = document.getElementById('typing-heading');
+    const subheadingText = document.getElementById('typing-subheading');
+    const headingTextToType = "Welcome To Our Website!!!";
+    const subheadingTextToType = "Write the atomic number/element's name/it's symbol of the element you want to know about or search by it's group number(e.g: Group-1)";
+    let headingIndex = 0, subheadingIndex = 0;
+    function typeHeading() { if (headingIndex < headingTextToType.length) { headingText.textContent += headingTextToType.charAt(headingIndex); headingIndex++; setTimeout(typeHeading, 100); } else typeSubheading(); }
+    function typeSubheading() { if (subheadingIndex < subheadingTextToType.length) { subheadingText.textContent += subheadingTextToType.charAt(subheadingIndex); subheadingIndex++; setTimeout(typeSubheading, 100); } }
+    window.addEventListener('load', () => { headingText.style.setProperty('--cursor-display', 'block'); typeHeading(); document.body.classList.add('ready'); });
+
+    /* Particle system */
+    const particleSystems = {};
+    const palette = ['#00f0ff', '#ff0368', '#8be9fd'];
+    function initParticleSystemForCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const ctx = canvas.getContext('2d');
+      const sys = {
+        id: canvasId, canvas, ctx, particles: [], animId: null,
+        mouseX: -9999, mouseY: -9999,
+        onMove: null, onLeave: null, onClick: null,
+        onTouchMove: null, onTouchStart: null, onTouchEnd: null,
+        onResize: null,
+        _longPressTimer: null
+      };
+      function resize() {
+        if (!sys.canvas) return;
+        sys.canvas.width = Math.max(1, sys.canvas.offsetWidth);
+        sys.canvas.height = Math.max(1, sys.canvas.offsetHeight);
+      }
+      sys.onResize = resize;
+      function spawn(x, y, fast) {
+        const speed = fast ? (Math.random() * 4 + 1.4) : (Math.random() * 1.2 + 0.2);
+        const ang = Math.random() * Math.PI * 2;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+        return { x, y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed, r: Math.random() * 2 + 0.9, life: 240 + Math.random() * 420, color };
+      }
+      sys.spawn = spawn;
+      sys.init = function () {
+        resize();
+        sys.particles.length = 0;
+        for (let i = 0; i < 90; i++) sys.particles.push(spawn(Math.random() * sys.canvas.width, Math.random() * sys.canvas.height, false));
+      };
+      sys.update = function () {
+        const ctx = sys.ctx, w = sys.canvas.width, h = sys.canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        for (let i = sys.particles.length - 1; i >= 0; i--) {
+          const p = sys.particles[i];
+          const dx = sys.mouseX - p.x, dy = sys.mouseY - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 260 && dist > 1) {
+            const force = (1 - (dist / 260)) * 1.2;
+            p.vx += (dx / dist) * force * 0.8;
+            p.vy += (dy / dist) * force * 0.8;
+          } else {
+            const cx = w * 0.5, cy = h * 0.5;
+            const ddx = cx - p.x, ddy = cy - p.y;
+            const dcenter = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (dcenter > Math.max(w, h) * 0.6) { p.vx += (ddx / dcenter) * 0.03; p.vy += (ddy / dcenter) * 0.03; }
+          }
+          p.x += p.vx; p.y += p.vy;
+          p.vx *= 0.96; p.vy *= 0.96;
+          if (p.x < -70) p.x = w + 10;
+          if (p.x > w + 70) p.x = -10;
+          if (p.y < -70) p.y = h + 10;
+          if (p.y > h + 70) p.y = -10;
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = 0.92;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 0.08;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 5.8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          p.life -= 1;
+          if (p.life <= 0 && sys.particles.length > 50) sys.particles.splice(i, 1);
+        }
+        for (let i = 0; i < sys.particles.length; i++) {
+          for (let j = i + 1; j < sys.particles.length; j++) {
+            const a = sys.particles[i], b = sys.particles[j];
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 110) {
+              const alpha = (1 - (d / 110)) * 0.09;
+              ctx.strokeStyle = `rgba(120,220,255,${alpha})`;
+              ctx.lineWidth = 0.7;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+      };
+      sys.loop = function () {
+        sys.update();
+        sys.animId = requestAnimationFrame(sys.loop);
+      };
+      sys.onMove = function (e) {
+        const rect = sys.canvas.getBoundingClientRect();
+        sys.mouseX = e.clientX - rect.left; sys.mouseY = e.clientY - rect.top;
+      };
+      sys.onLeave = function () { sys.mouseX = sys.mouseY = -9999; };
+      sys.onClick = function (e) {
+        const rect = sys.canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+        if (navigator.vibrate) { try { navigator.vibrate(10); } catch (e) {} }
+        for (let k = 0; k < 18; k++) sys.particles.push(spawn(cx + (Math.random() - 0.5) * 18, cy + (Math.random() - 0.5) * 18, true));
+      };
+      sys.onTouchMove = function (e) {
+        if (e.cancelable) e.preventDefault();
+        const t = e.touches[0] || e.changedTouches[0];
+        if (!t) return;
+        const rect = sys.canvas.getBoundingClientRect();
+        sys.mouseX = t.clientX - rect.left; sys.mouseY = t.clientY - rect.top;
+      };
+      sys.onTouchStart = function (e) {
+        if (e.cancelable) e.preventDefault();
+        const t = e.touches[0] || e.changedTouches[0];
+        if (!t) return;
+        const rect = sys.canvas.getBoundingClientRect();
+        const cx = t.clientX - rect.left, cy = t.clientY - rect.top;
+        sys.mouseX = cx; sys.mouseY = cy;
+        if (navigator.vibrate) { try { navigator.vibrate(20); } catch (err) {} }
+        for (let k = 0; k < 18; k++) sys.particles.push(spawn(cx + (Math.random() - 0.5) * 18, cy + (Math.random() - 0.5) * 18, true));
+        if (sys._longPressTimer) clearTimeout(sys._longPressTimer);
+        sys._longPressTimer = setTimeout(() => {
+          if (navigator.vibrate) { try { navigator.vibrate([40, 20, 40]); } catch (err) {} }
+          for (let k = 0; k < 36; k++) sys.particles.push(spawn(cx + (Math.random() - 0.5) * 36, cy + (Math.random() - 0.5) * 36, true));
+          sys._longPressTimer = null;
+        }, 480);
+      };
+      sys.onTouchEnd = function (e) {
+        if (sys._longPressTimer) { clearTimeout(sys._longPressTimer); sys._longPressTimer = null; }
+        if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+        sys.mouseX = sys.mouseY = -9999;
+      };
+      sys.start = function () {
+        if (sys.animId) return;
+        sys.init();
+        sys.canvas.addEventListener('mousemove', sys.onMove);
+        sys.canvas.addEventListener('mouseleave', sys.onLeave);
+        sys.canvas.addEventListener('click', sys.onClick);
+        sys.canvas.addEventListener('touchstart', sys.onTouchStart, { passive: false });
+        sys.canvas.addEventListener('touchmove', sys.onTouchMove, { passive: false });
+        sys.canvas.addEventListener('touchend', sys.onTouchEnd);
+        const parent = sys.canvas.parentElement;
+        if (parent && parent !== sys.canvas) {
+          parent.addEventListener('touchstart', sys.onTouchStart, { passive: false });
+          parent.addEventListener('touchmove', sys.onTouchMove, { passive: false });
+          parent.addEventListener('touchend', sys.onTouchEnd);
+          parent.addEventListener('click', sys.onClick);
+        }
+        window.addEventListener('resize', sys.onResize);
+        sys.loop();
+      };
+      sys.stop = function () {
+        if (sys._longPressTimer) { clearTimeout(sys._longPressTimer); sys._longPressTimer = null; }
+        if (sys.animId) { cancelAnimationFrame(sys.animId); sys.animId = null; }
+        sys.canvas.removeEventListener('mousemove', sys.onMove);
+        sys.canvas.removeEventListener('mouseleave', sys.onLeave);
+        sys.canvas.removeEventListener('click', sys.onClick);
+        sys.canvas.removeEventListener('touchstart', sys.onTouchStart, { passive: false });
+        sys.canvas.removeEventListener('touchmove', sys.onTouchMove, { passive: false });
+        sys.canvas.removeEventListener('touchend', sys.onTouchEnd);
+        const parent = sys.canvas.parentElement;
+        if (parent && parent !== sys.canvas) {
+          parent.removeEventListener('touchstart', sys.onTouchStart, { passive: false });
+          parent.removeEventListener('touchmove', sys.onTouchMove, { passive: false });
+          parent.removeEventListener('touchend', sys.onTouchEnd);
+          parent.removeEventListener('click', sys.onClick);
+        }
+        window.removeEventListener('resize', sys.onResize);
+        sys.mouseX = sys.mouseY = -9999;
+      };
+      return sys;
+    }
+
+    function startParticlesForCanvas(canvasId) {
+      if (!particleSystems[canvasId]) particleSystems[canvasId] = initParticleSystemForCanvas(canvasId);
+      const sys = particleSystems[canvasId];
+      if (sys) sys.start();
+    }
+    function stopParticlesForCanvas(canvasId) {
+      const sys = particleSystems[canvasId];
+      if (sys) sys.stop();
+    }
+
+    /* Initialize canvases and ensure loader is hidden */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('results-particles')) initParticleSystemForCanvas('results-particles');
+      if (document.getElementById('periodic-particles')) initParticleSystemForCanvas('periodic-particles');
+      hideLoading();
+    });
+  </script>
+</body>
+</html>
